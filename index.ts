@@ -4,11 +4,28 @@ const typeDefs: string = `
   type Query {
     totalPhotos: Int!
   }
+
+    type Mutation {
+      postPhoto(name: String! description: String): String!
+    }
 `;
+
+type PhotoType = {
+  name: string,
+  description: string,
+};
+
+var photos: PhotoType[] = []
 
 const resolvers = {
   Query: {
-    totalPhotos: () => 42
+    totalPhotos: (): number => photos.length
+  },
+  Mutation: {
+    postPhoto(parent: any, args: PhotoType) {
+      photos.push(args);
+      return JSON.stringify(args);
+    }
   }
 }
 
