@@ -1,12 +1,20 @@
 import { ApolloServer } from 'apollo-server';
 
 const typeDefs: string = `
+  type Photo {
+    id: ID!
+    url: String!
+    name: String!
+    description: String
+  }
+
   type Query {
     totalPhotos: Int!
+    allPhotos: [Photo!]!
   }
 
     type Mutation {
-      postPhoto(name: String! description: String): String!
+      newPhoto(name: String! description: String): Photo!
     }
 `;
 
@@ -15,17 +23,26 @@ type PhotoType = {
   description: string,
 };
 
+var _id: number = 0
 var photos: PhotoType[] = []
 
 const resolvers = {
   Query: {
-    totalPhotos: (): number => photos.length
+    totalPhotos: (): number => photos.length,
+    allPhotos: (): PhotoType[] => photos
   },
   Mutation: {
-    postPhoto(parent: any, args: PhotoType) {
-      photos.push(args);
-      return JSON.stringify(args);
+    newPhoto(parent: any, args: PhotoType) {
+      var tmp_photo = {
+        id: _id++,
+        ...args
+      };
+      photos.push(tmp_photo);
+      return tmp_photo;
     }
+  },
+  Photo: {
+    url: (parent: any) => `http://yoursite.com/img/${parent.id}`
   }
 }
 
