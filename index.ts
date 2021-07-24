@@ -1,10 +1,25 @@
 import { ApolloServer } from 'apollo-server';
 
 const typeDefs: string = `
+  enum PhotoCategory {
+    SELECT
+    PORTRAIT
+    ACTION
+    LANDSCAPE
+    GRAPHIC
+  }
+
   type Photo {
     id: ID!
     url: String!
     name: String!
+    description: String
+    category: PhotoCategory!
+  }
+
+  input NewPhotoInput {
+    name: String!
+    category: PhotoCategory=PORTRAIT
     description: String
   }
 
@@ -14,7 +29,7 @@ const typeDefs: string = `
   }
 
     type Mutation {
-      newPhoto(name: String! description: String): Photo!
+      newPhoto(input: NewPhotoInput!): Photo!
     }
 `;
 
@@ -32,10 +47,10 @@ const resolvers = {
     allPhotos: (): PhotoType[] => photos
   },
   Mutation: {
-    newPhoto(parent: any, args: PhotoType) {
+    newPhoto(parent: any, args: any) {
       var tmp_photo = {
         id: _id++,
-        ...args
+        ...args.input
       };
       photos.push(tmp_photo);
       return tmp_photo;
